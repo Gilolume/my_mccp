@@ -1,9 +1,16 @@
 pragma solidity ^0.4.2;
 
+import "./TokenBTU.sol";
+
 /* Availabilities implementation */
 contract ResContract {
     
-    enum BookingStatus { AVAILABLE, REQUESTED, REJECTED, CONFIRMED, CANCELLED  }
+    address                                 owner;
+    TokenBTU                                BTU;
+    uint public                             availabilityCount;
+    mapping (uint => Availability) public   availabilities;
+
+    enum BookingStatus { AVAILABLE, REQUESTED, REJECTED, CONFIRMED, CANCELLED }
     struct Availability {
         address                 _provider;  // address of the provider
         address                 _booker;    // address of the booker
@@ -18,19 +25,14 @@ contract ResContract {
         bytes32                 _metaDataLink; //metadatas
     }
 
-    uint public availabilityCount;
-    mapping (uint => Availability) public availabilities;
-
-    function ResContract () public {
-        publishAvailability(0, 1, 20, 1517356800000, 1517356800000, 1517356800000, BookingStatus.AVAILABLE, 0x0);
-        publishAvailability(0, 1, 22, 1517356800000, 1517356800000, 1517356800000, BookingStatus.AVAILABLE, 0x0);
-        publishAvailability(0, 1, 24, 1517356800000, 1517356800000, 1517356800000, BookingStatus.AVAILABLE, 0x0);
+    function ResContract() public {
+        BTU = new TokenBTU(12000000000000000000, "TokenBTU", "BTU");
     }
 
     //Submit one availability
-    function publishAvailability ( uint _type, uint _minDeposit, uint _commission, 
-                                   uint _freeCancelDateTs, uint _startDateTs, 
-                                   uint _endDateTs, BookingStatus _bookingStatus, bytes32 _metaDataLink)
+    function publishAvailability (uint _type, uint _minDeposit, uint _commission, 
+                                  uint _freeCancelDateTs, uint _startDateTs, 
+                                  uint _endDateTs, BookingStatus _bookingStatus, bytes32 _metaDataLink)
     public returns (BookingStatus status) 
     {
         availabilities[availabilityCount] = Availability( msg.sender, 0x0, availabilityCount, _type, _minDeposit,
@@ -45,14 +47,14 @@ contract ResContract {
     public constant returns (uint[], address[], address[], 
                              uint[], uint[], BookingStatus[])
     {
-        uint[] memory              keys = new uint[](availabilityCount);
-        address[] memory           providers = new address[](availabilityCount);
-        address[] memory           bookers = new address[](availabilityCount);
-        uint[] memory              resourceIds = new uint[](availabilityCount);
-        uint[] memory              types = new uint[](availabilityCount);
-        uint[] memory              startDateTs = new uint[](availabilityCount);
-        uint[] memory              endDateTs = new uint[](availabilityCount);
-        BookingStatus[] memory     bookingStatuses = new BookingStatus[](availabilityCount);
+        uint[] memory           keys = new uint[](availabilityCount);
+        address[] memory        providers = new address[](availabilityCount);
+        address[] memory        bookers = new address[](availabilityCount);
+        uint[] memory           resourceIds = new uint[](availabilityCount);
+        uint[] memory           types = new uint[](availabilityCount);
+        uint[] memory           startDateTs = new uint[](availabilityCount);
+        uint[] memory           endDateTs = new uint[](availabilityCount);
+        BookingStatus[] memory  bookingStatuses = new BookingStatus[](availabilityCount);
 
         for (uint i = 0 ; i < availabilityCount ; i++) {
             keys[i] = i;
@@ -73,11 +75,11 @@ contract ResContract {
     public constant returns (uint, uint, uint,
                              uint, BookingStatus, bytes32)
     {
-        uint             minDeposit;
-        uint             commission;
-        uint             freeCancelDateTs;
-        BookingStatus    bookingStatus;
-        bytes32          metaDataLink;
+        uint                    minDeposit;
+        uint                    commission;
+        uint                    freeCancelDateTs;
+        BookingStatus           bookingStatus;
+        bytes32                 metaDataLink;
 
         minDeposit = availabilities[availabilityNumber]._minDeposit;
         commission = availabilities[availabilityNumber]._commission;
@@ -147,7 +149,7 @@ contract ResContract {
     }
 
     //Update reservation
-    function updateAvailability ( uint availabilityNumber, uint _type, uint _minDeposit, uint _commission, 
+    function updateAvailability (uint availabilityNumber, uint _type, uint _minDeposit, uint _commission, 
                                  uint _freeCancelDateTs, uint _startDateTs, 
                                  uint _endDateTs, BookingStatus _bookingStatus, bytes32 _metaDataLink)
     public returns (bool status) 

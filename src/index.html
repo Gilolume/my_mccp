@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>Election Results</title>
+    <title>Booking</title>
 
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -24,6 +24,20 @@
         <div class="col-lg-12">
           <h1 class="text-center">Booking</h1>
           <p id="accountAddress" class="text-center"></p>
+
+          <p id="accountBalance" class="text-center"></p>
+
+          <form>
+              <div class="form-group">
+                <label>Buy BTU</label>
+                <div class="input-group">
+                  <input type="number" class="form-control" id="btuAmount">
+                </div>
+              </div>
+              <button onClick="App.castBuyBTU(); return false;" type="submit" class="btn btn-primary">Buy</button>
+              <hr />
+            </form>
+
           <hr/>
           <br/>
           <div id="content">
@@ -45,13 +59,16 @@
               </tbody>
             </table>
             <hr/>
-            <form onSubmit="App.castRequestReservation(); return false;">
+            <form>
               <div class="form-group">
                 <label for="availabilitiesRequest">Request availabilities</label>
                 <select class="form-control" id="availabilitiesRequest">
                 </select>
               </div>
-              <button type="submit" class="btn btn-primary">Request</button>
+              <button onClick="App.castRequestReservation(); return false;" type="submit" class="btn btn-primary">Request</button>
+              <button onClick="App.castConfirmReservation(); return false;" type="submit" class="btn btn-primary">Confirm</button>
+              <button onClick="App.castCancelReservation(); return false;" type="submit" class="btn btn-primary">Cancel</button>
+              <button onClick="App.castRejectReservation(); return false;" type="submit" class="btn btn-primary">Reject</button>
               <hr />
             </form>
           </div>
@@ -89,7 +106,7 @@
             <div class="form-group">
               <label>Dépot minimum</label>
               <div class="input-group">
-                <span class="input-group-addon">BUT</span>
+                <span class="input-group-addon">BTU</span>
                 <input type="number" class="form-control" id="minDeposit">
               </div>
             </div>
@@ -97,7 +114,7 @@
             <div class="form-group">
               <label>Commission</label>
               <div class="input-group">
-                <span class="input-group-addon">BUT</span>
+                <span class="input-group-addon">BTU</span>
                 <input type="number" class="form-control" id="commission">
               </div>
             </div>
@@ -105,7 +122,7 @@
             <div class="form-group">
               <label>Date de début</label>
               <div class="input-group">
-                <span class="input-group-addon">BUT</span>
+                <span class="input-group-addon"></span>
                 <input type="date" class="form-control" id="startDate">
               </div>
             </div>
@@ -113,7 +130,7 @@
             <div class="form-group">
               <label>Date de fin</label>
               <div class="input-group">
-                <span class="input-group-addon">BUT</span>
+                <span class="input-group-addon"></span>
                 <input type="date" class="form-control" id="endDate">
               </div>
             </div>
@@ -121,7 +138,7 @@
             <div class="form-group">
               <label>Date limite d'annulation</label>
               <div class="input-group">
-                <span class="input-group-addon">BUT</span>
+                <span class="input-group-addon"></span>
                 <input type="date" class="form-control" id="freeCancelDate">
               </div>
             </div>

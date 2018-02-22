@@ -28,9 +28,17 @@ App = {
       // Connect provider to interact with contract
       App.contracts.ResContract.setProvider(App.web3Provider);
 
-      //App.listenForEvents();
-
-      return App.render();
+      $.getJSON("TokenBTU.json", function(tokenbtui) {
+        // Instantiate a new truffle contract from the artifact
+        App.contracts.TokenBTU = TruffleContract(tokenbtui);
+        // Connect provider to interact with contract
+        App.contracts.TokenBTU.setProvider(App.web3Provider);
+  
+        //App.listenForEvents();
+  
+        return App.render();
+      });
+      
     });
   },
 
@@ -46,6 +54,12 @@ App = {
       }
     });
 
+    // Load account balance
+    App.contracts.TokenBTU.deployed().then(function(instance) {
+      return instance.getMyAddressBalance();
+    }).then(function(addressBalance) {
+      $("#accountAddress").html("Your balance: " + addressBalance);
+    })
 
 
     // Load contract data
@@ -158,12 +172,37 @@ App = {
 
   },
 
+  castBuyBTU: function() {
+    var btuAmount = $('#btuAmount').val();
+    App.contracts.TokenBTU.deployed().then(function(instance) {
+      return instance.buyBTU(btuAmount, { from: App.account });
+    })
+  },
   castRequestReservation: function() {
     var resquestId = $('#availabilitiesRequest').val();
     App.contracts.ResContract.deployed().then(function(instance) {
       return instance.requestAvailability(resquestId, { from: App.account });
     })
-  }
+  },
+  castConfirmReservation: function() {
+    var resquestId = $('#availabilitiesRequest').val();
+    App.contracts.ResContract.deployed().then(function(instance) {
+      return instance.confirmAvailability(resquestId, { from: App.account });
+    })
+  },
+  castCancelReservation: function() {
+    var resquestId = $('#availabilitiesRequest').val();
+    App.contracts.ResContract.deployed().then(function(instance) {
+      return instance.cancelAvailability(resquestId, { from: App.account });
+    })
+  },
+  castRejectReservation: function() {
+    var resquestId = $('#availabilitiesRequest').val();
+    App.contracts.ResContract.deployed().then(function(instance) {
+      return instance.rejectAvailability(resquestId, { from: App.account });
+    })
+  },
+
 };
 
 $(function() {
