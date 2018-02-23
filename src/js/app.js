@@ -91,8 +91,8 @@ App = {
             "<th>" + resourceId + "</th>"+
             "<th>" + web3.toAscii(metaDataLink) + "</th>"+
             "<th>" + App.getStringType(type) + "</th>"+
-            "<td>" + App.getDateFromTimestamp(parseInt(startDateTs)) + "</td>"+
-            "<td>" + App.getDateFromTimestamp(parseInt(endDateTs)) + "</td>"+
+            "<th>" + App.getDateFromTimestamp(parseInt(startDateTs)) + "</th>"+
+            "<th>" + App.getDateFromTimestamp(parseInt(endDateTs)) + "</th>"+
             "<th>" + minDeposit + "</th>"+
             "<th>" + commission + "</th>"+
             "<th>" + App.getDateFromTimestamp(parseInt(freeCancelDateTs)) + "</th>"+
