@@ -25,8 +25,8 @@ contract ResContract {
         bytes32                 _metaDataLink; //metadatas
     }
 
-    function ResContract() public {
-        BTU = new TokenBTU(12000000000000000000, "TokenBTU", "BTU");
+    function ResContract(address contractAddress) public {
+        BTU = TokenBTU(contractAddress);
     }
 
     //Submit one availability
@@ -38,9 +38,9 @@ contract ResContract {
         if (_commission > _minDeposit) {
             return BookingStatus.REJECTED;
         }
-        availabilities[availabilityCount] = Availability( msg.sender, 0x0, availabilityCount, _type, _minDeposit,
-                                                          _commission, _freeCancelDateTs, _startDateTs, _endDateTs,
-                                                          _bookingStatus, _metaDataLink);
+        availabilities[availabilityCount] = Availability(msg.sender, 0x0, availabilityCount, _type, _minDeposit,
+                                                         _commission, _freeCancelDateTs, _startDateTs, _endDateTs,
+                                                         _bookingStatus, _metaDataLink);
         availabilityCount++;
         return _bookingStatus;
     }
@@ -102,9 +102,9 @@ contract ResContract {
     public returns (BookingStatus)
     {
         if (BTU.escrowAmount(availabilityNumber, msg.sender,
-                              availabilities[availabilityNumber]._provider, 
-                              availabilities[availabilityNumber]._minDeposit,
-                              availabilities[availabilityNumber]._commission))
+                             availabilities[availabilityNumber]._provider, 
+                             availabilities[availabilityNumber]._minDeposit,
+                             availabilities[availabilityNumber]._commission))
         {
             if (availabilities[availabilityNumber]._bookingStatus == BookingStatus.AVAILABLE) {
                 availabilities[availabilityNumber]._bookingStatus = BookingStatus.REQUESTED;
@@ -154,7 +154,11 @@ contract ResContract {
     public returns (BookingStatus)
     {
         if (availabilities[availabilityNumber]._provider == msg.sender) {
-            BTU.escrowResolveDispute(availabilityNumber);
+            if (availabilities[availabilityNumber]._freeCancelDateTs > now) {
+                BTU.escrowResolveDispute(availabilityNumber);
+            } else {
+                BTU.escrowBackToAccount(availabilityNumber, availabilities[availabilityNumber]._booker);
+            }
             availabilities[availabilityNumber]._bookingStatus = BookingStatus.CANCELLED;
         }
         return (availabilities[availabilityNumber]._bookingStatus);

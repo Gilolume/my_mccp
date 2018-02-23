@@ -151,8 +151,6 @@ App = {
   addAvailability: function() {
 
     //  resContractInstance.publishAvailability(type, minDeposit, commission, freeCancelDate, startDate, endDate, bookingStatus, name);
-
-    console.log(App.contracts.ResContract);
     
     var name = $('#name').val();
     var type = $('#type').val();
