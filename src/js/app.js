@@ -130,7 +130,7 @@ App = {
   },
 
   getDateFromTimestamp: function(timestamp) {
-    var date = new Date(timestamp)
+    var date = new Date(timestamp * 1000)
     var day = String(date.getDate());
     var month = String((date.getMonth() + 1));
     var year = String(date.getFullYear());
@@ -145,7 +145,7 @@ App = {
 
   getTimestampFromDate: function(date) {
     var myDate = new Date(date).getTime()
-    return myDate
+    return myDate / 1000
   },
 
   addAvailability: function() {

@@ -153,8 +153,9 @@ contract ResContract {
     function cancelAvailability (uint availabilityNumber)
     public returns (BookingStatus)
     {
-        if (availabilities[availabilityNumber]._provider == msg.sender) {
-            if (availabilities[availabilityNumber]._freeCancelDateTs > now) {
+        uint currentTime = now;
+        if (availabilities[availabilityNumber]._booker == msg.sender) {
+            if (availabilities[availabilityNumber]._freeCancelDateTs < currentTime) {
                 BTU.escrowResolveDispute(availabilityNumber);
             } else {
                 BTU.escrowBackToAccount(availabilityNumber, availabilities[availabilityNumber]._booker);
