@@ -58,7 +58,7 @@ App = {
     App.contracts.TokenBTU.deployed().then(function(instance) {
       return instance.getMyAddressBalance();
     }).then(function(addressBalance) {
-      $("#accountAddress").html("Your balance: " + addressBalance);
+      $("#accountBalance").html("Your balance: " + addressBalance);
     })
 
 

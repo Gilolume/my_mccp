@@ -35,6 +35,9 @@ contract ResContract {
                                   uint _endDateTs, BookingStatus _bookingStatus, bytes32 _metaDataLink)
     public returns (BookingStatus status) 
     {
+        if (_commission > _minDeposit) {
+            return BookingStatus.REJECTED;
+        }
         availabilities[availabilityCount] = Availability( msg.sender, 0x0, availabilityCount, _type, _minDeposit,
                                                           _commission, _freeCancelDateTs, _startDateTs, _endDateTs,
                                                           _bookingStatus, _metaDataLink);
@@ -98,9 +101,15 @@ contract ResContract {
     function requestAvailability (uint availabilityNumber)
     public returns (BookingStatus)
     {
-        if (availabilities[availabilityNumber]._bookingStatus == BookingStatus.AVAILABLE) {
-            availabilities[availabilityNumber]._bookingStatus = BookingStatus.REQUESTED;
-            availabilities[availabilityNumber]._booker = msg.sender;
+        if (BTU.escrowAmount(availabilityNumber, msg.sender,
+                              availabilities[availabilityNumber]._provider, 
+                              availabilities[availabilityNumber]._minDeposit,
+                              availabilities[availabilityNumber]._commission))
+        {
+            if (availabilities[availabilityNumber]._bookingStatus == BookingStatus.AVAILABLE) {
+                availabilities[availabilityNumber]._bookingStatus = BookingStatus.REQUESTED;
+                availabilities[availabilityNumber]._booker = msg.sender;
+            }
         }
         return (availabilities[availabilityNumber]._bookingStatus);
     }
@@ -114,6 +123,7 @@ contract ResContract {
     public returns (BookingStatus)
     {
         if (availabilities[availabilityNumber]._provider == msg.sender) {
+            BTU.escrowBackToAccount(availabilityNumber, availabilities[availabilityNumber]._booker);
             availabilities[availabilityNumber]._bookingStatus = BookingStatus.REJECTED;
         }
         return (availabilities[availabilityNumber]._bookingStatus);
@@ -122,12 +132,13 @@ contract ResContract {
     //confirm reservation
     /* TO-ADD
      * BTU Logic :
-     * BTU escrows deposit amount 
+     * BTU gives back to the booker 
      */
     function confirmAvailability (uint availabilityNumber)
     public returns (BookingStatus)
     {
         if (availabilities[availabilityNumber]._provider == msg.sender) {
+            BTU.escrowBackToAccount(availabilityNumber, availabilities[availabilityNumber]._booker);
             availabilities[availabilityNumber]._bookingStatus = BookingStatus.CONFIRMED;
         }
         return (availabilities[availabilityNumber]._bookingStatus);
@@ -143,6 +154,7 @@ contract ResContract {
     public returns (BookingStatus)
     {
         if (availabilities[availabilityNumber]._provider == msg.sender) {
+            BTU.escrowResolveDispute(availabilityNumber);
             availabilities[availabilityNumber]._bookingStatus = BookingStatus.CANCELLED;
         }
         return (availabilities[availabilityNumber]._bookingStatus);

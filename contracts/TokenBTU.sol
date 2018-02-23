@@ -10,6 +10,13 @@ contract TokenBTU {
     uint8 public decimals = 18;
     // 18 decimals is the strongly suggested default, avoid changing it
     uint256 public totalSupply;
+    mapping (uint => Reservation) public   reservations;
+    struct Reservation {
+        address     provider;
+        address     booker;
+        uint        amount;
+        uint        commission;
+    }
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -162,5 +169,29 @@ contract TokenBTU {
 
     function getMyAddressBalance() public constant returns (uint balance) {
         return balanceOf[msg.sender];
+    }
+
+    function escrowAmount(uint availabilityId, address booker, address provider, uint amount, uint commission) public returns (bool response) {
+        if (balanceOf[booker] < amount) {
+            return false;
+        }
+        reservations[availabilityId] = Reservation(provider, booker, amount, commission);
+        balanceOf[booker] -= amount;
+        return true;
+    }
+
+    function escrowBackToAccount(uint availabilityId, address payTo) public returns (bool response) {
+        balanceOf[payTo] += reservations[availabilityId].amount;
+        reservations[availabilityId].amount = 0;
+        reservations[availabilityId].commission = 0;
+        return true;
+    }
+
+    function escrowResolveDispute(uint availabilityId) public returns (bool response) {
+        balanceOf[reservations[availabilityId].provider] += reservations[availabilityId].amount - reservations[availabilityId].commission;
+        balanceOf[reservations[availabilityId].booker] += reservations[availabilityId].commission;
+        reservations[availabilityId].commission = 0;
+        reservations[availabilityId].amount = 0;
+        return true;
     }
 }
